@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from press.models import Post, PostStatus
+from press.models import Post, PostStatus, Category
 
 
 def index(request):
@@ -25,3 +25,7 @@ def post_detail(request, post_id):
 def posts(request):
     post_list = Post.objects.filter(status=PostStatus.PUBLISHED.value).order_by('-pk')[:10]
     return render(request, 'post_list.html', {'post_list': post_list})
+
+def categories(request):
+    categorie_list = Category.objects.all()
+    return render(request, 'categories.html', {'category_list': categorie_list})
