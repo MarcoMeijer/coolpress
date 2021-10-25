@@ -1,7 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 
-from press.models import Post, PostStatus, Category
+from press.forms import PostForm
+from press.models import Category, Post, PostStatus
 
 
 def index(request):
@@ -29,3 +33,24 @@ def posts(request):
 def categories(request):
     categorie_list = Category.objects.all()
     return render(request, 'categories.html', {'category_list': categorie_list})
+
+@login_required
+def post_update(request, post_id=None):
+    post = None
+    if post_id:
+        post = get_object_or_404(Post, pk=post_id)
+        if request.user != post.author.user:
+            return HttpResponseBadRequest('Now Allowed to change others posts')
+    
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.author = request.user.cooluser
+            instance.save()
+            redirect_url = reverse('post-detail', kwargs={'post_id': instance.id})
+            return HttpResponseRedirect(redirect_url)
+    else:
+        form = PostForm(instance=post)
+    
+    return render(request, 'post_update.html', {'form': form})

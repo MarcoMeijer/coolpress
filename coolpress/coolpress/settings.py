@@ -124,3 +124,8 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TEMPLATES[0]['OPTIONS']['context_processors'].append(
+    "press.context_processors.categories_processor")
+TEMPLATES[0]['OPTIONS']['context_processors'].append(
+    "press.context_processors.cooluser_processor")
