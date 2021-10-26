@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.http.response import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView
 
-from press.forms import PostForm
+from press.forms import PostForm, CategoryForm
 from press.models import Category, Post, PostStatus
 
 
@@ -26,13 +27,9 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     return render(request, 'post_detail.html', {'post_obj': post})
 
-def posts(request):
-    post_list = Post.objects.filter(status=PostStatus.PUBLISHED.value).order_by('-pk')[:10]
-    return render(request, 'post_list.html', {'post_list': post_list})
-
-def categories(request):
-    categorie_list = Category.objects.all()
-    return render(request, 'categories.html', {'category_list': categorie_list})
+def posts_list(request):
+    posts = Post.objects.filter(status=PostStatus.PUBLISHED.value).order_by('-pk')[:10]
+    return render(request, 'post_list.html', {'post_list': posts})
 
 @login_required
 def post_update(request, post_id=None):
@@ -54,3 +51,20 @@ def post_update(request, post_id=None):
         form = PostForm(instance=post)
     
     return render(request, 'post_update.html', {'form': form})
+
+class AboutView(TemplateView):
+    template_name = "about.html"
+
+class CategoryDetail(DetailView):
+    model = Category
+
+class CategoryList(ListView):
+    model = Category
+
+class CategoryAdd(CreateView):
+    model = Category
+    form_class = CategoryForm
+
+class CategoryUpdate(UpdateView):
+    model = Category
+    form_class = CategoryForm
