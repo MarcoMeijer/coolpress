@@ -17,7 +17,7 @@ class PostForm(ModelForm):
 
 class CategoryForm(ModelForm):
     class Meta:
-        mode =  Category
+        model =  Category
         fields = ['slug', 'label']
         widgets = {
             'slug': TextInput(attrs={'class': 'form-control'}),
