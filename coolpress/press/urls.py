@@ -15,4 +15,5 @@ urlpatterns = [
     path('categories/', views.CategoryList.as_view(), name='category-list'),
     path('category/add/', views.CategoryAdd.as_view(), name='category-add'),
     path('category/update/<int:pk>', views.CategoryUpdate.as_view(), name='category-update'),
+    path('category-json/<str:slug>', views.category_api, name='category-json'),
 ]
