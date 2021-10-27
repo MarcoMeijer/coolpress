@@ -1,3 +1,5 @@
+import django_heroku
+
 """
 Django settings for coolpress project.
 
@@ -9,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+
 
 from pathlib import Path
 
@@ -129,3 +132,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "press.context_processors.categories_processor")
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     "press.context_processors.cooluser_processor")
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
