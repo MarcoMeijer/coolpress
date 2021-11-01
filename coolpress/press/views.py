@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView, DetailView, ListView, CreateView, UpdateView
 
 from press.forms import PostForm, CategoryForm
-from press.models import Category, Post, PostStatus
+from press.models import Category, Post, PostStatus, CoolUser
 
 
 def index(request):
@@ -26,10 +26,6 @@ def get_html_from_post(post):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     return render(request, 'post_detail.html', {'post_obj': post})
-
-def posts_list(request):
-    posts = Post.objects.filter(status=PostStatus.PUBLISHED.value).order_by('-pk')[:10]
-    return render(request, 'post_list.html', {'post_list': posts})
 
 @login_required
 def post_update(request, post_id=None):
@@ -75,11 +71,19 @@ class PostList(ListView):
     context_object_name = 'post_list'
     template_name = 'post_list.html'
 
+class CategoryPostList(PostList):
     def get_queryset(self):
-        queryset = super(PostList, self).get_queryset()
+        queryset = super(CategoryPostList, self).get_queryset()
         category_slug = self.kwargs['category_slug']
         category = get_object_or_404(Category, slug=category_slug)
         return queryset.filter(category=category)
+
+class AuthorPostList(PostList):
+    def get_queryset(self):
+        queryset = super(AuthorPostList, self).get_queryset()
+        pk = self.kwargs['pk']
+        author = get_object_or_404(CoolUser, pk=pk)
+        return queryset.filter(author=author)
 
 def category_api(request, slug):
     cat = get_object_or_404(Category, slug=slug)

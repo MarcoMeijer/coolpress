@@ -5,8 +5,9 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('post/<int:post_id>', views.post_detail, name='post-detail'),
-    path('posts/', views.posts_list, name='posts-list'),
-    path('posts/<str:category_slug>', views.PostList.as_view(), name='post-list-category'),
+    path('posts/', views.PostList.as_view(), name='posts-list'),
+    path('posts/<str:category_slug>', views.CategoryPostList.as_view(), name='post-list-category'),
+    path('posts/author/<int:pk>', views.AuthorPostList.as_view(), name='posts-list-author'),
     path('accounts/', include('django.contrib.auth.urls'), name='accounts'),
     path('post/add/', views.post_update, name='post-add'),
     path('post/update/<int:post_id>', views.post_update, name='post-update'),
