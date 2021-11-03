@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
-from press.user_management import get_gravatar_link
+from press.user_management import get_gravatar_link, get_github_repositories
 
 
 class CoolUser(models.Model):
@@ -19,14 +19,19 @@ class CoolUser(models.Model):
 
     def save(self, *args, **kwargs):
         super(CoolUser,self).save(*args, **kwargs)
-
-        if self.gravatar_link is None and self.user.email:
+        if self.user.email:
             email = self.user.email
             gravatar_link = get_gravatar_link(email)
             if gravatar_link != self.gravatar_link:
                 self.gravatar_link = gravatar_link
                 self.save()
+        gh_repositories = None
+        if self.github_profile:
+            gh_repositories = get_github_repositories(self.github_profile)
 
+        if gh_repositories != self.gh_repositories:
+            self.gh_repositories = gh_repositories
+            self.save()
 
 class Category(models.Model):
     class Meta:

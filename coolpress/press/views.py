@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponse
 from django.http.response import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -85,8 +86,37 @@ class AuthorPostList(PostList):
         author = get_object_or_404(CoolUser, pk=pk)
         return queryset.filter(author=author)
 
+class PostFilteredByText(PostList):
+    def get_queryset(self):
+        queryset = super(PostFilteredByText, self).get_queryset()
+        search_text = self.request.GET.get('q')
+        qs1 = Q(title__icontains=search_text)
+        qs2 = Q(body__icontains=search_text)
+        qs3 = Q(author__user__username__icontains=search_text)
+        qs4 = Q(category__label__icontains=search_text)
+        return queryset.filter(qs1 | qs2 | qs3 | qs4)
+
 def category_api(request, slug):
     cat = get_object_or_404(Category, slug=slug)
     return JsonResponse(
         dict(slug=cat.slug, label=cat.label)
     )
+
+
+def search_ajax(request):
+    query_search = request.GET.get('q')
+    posts = Post.objects.filter(title__icontains=query_search).values('id', 'title', 'body',
+                                                                      'author__user__username',
+                                                                      'category__label')
+    ret = {p['id']: p for p in posts}
+    return JsonResponse(
+        ret
+    )
+
+
+class CoolUserDetail(DetailView):
+    model = CoolUser
+
+
+class CoolUserList(ListView):
+    model = CoolUser
