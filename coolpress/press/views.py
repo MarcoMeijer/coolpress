@@ -96,6 +96,11 @@ class PostFilteredByText(PostList):
         qs4 = Q(category__label__icontains=search_text)
         return queryset.filter(qs1 | qs2 | qs3 | qs4)
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(PostFilteredByText, self).get_context_data(*args, **kwargs)
+        context['search_data'] = self.request.GET.get('q')
+        return context
+
 def category_api(request, slug):
     cat = get_object_or_404(Category, slug=slug)
     return JsonResponse(
