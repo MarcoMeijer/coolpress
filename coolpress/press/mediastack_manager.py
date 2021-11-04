@@ -61,7 +61,7 @@ def insert_post_from_mediastack(single_post):
         cat = get_or_create_category(single_post["category"])
         cu = get_or_create_author(single_post["author"], single_post["source"])
 
-        post = Post.objects.create(category=cat, author=cu, title=title, body=body, image_link=image_link)
+        post = Post.objects.create(category=cat, author=cu, title=title, body=body, image_link=image_link, status='published')
         return post
 
 def gather_and_create_news(categories, languages, limit) -> List[Post]:
