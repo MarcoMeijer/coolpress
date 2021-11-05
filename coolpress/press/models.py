@@ -1,16 +1,19 @@
+from datetime import datetime
 from enum import Enum
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
-from press.user_management import get_gravatar_link, get_github_repositories
+from press.user_management import get_gravatar_link, get_github_repositories, get_github_followers
 
 
 class CoolUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_profile = models.CharField(max_length=150, null=True, blank=True)
     gh_repositories = models.IntegerField(null=True, blank=True)
+    gh_followers = models.IntegerField(null=True, blank=True)
+    last_followers_check = models.DateTimeField(null=True, blank=True)
     gravatar_link = models.CharField(max_length=400, null=True, blank=True)
 
     def __str__(self):
@@ -25,13 +28,33 @@ class CoolUser(models.Model):
             if gravatar_link != self.gravatar_link:
                 self.gravatar_link = gravatar_link
                 self.save()
+                return
+
+        # update gh_repositories
         gh_repositories = None
         if self.github_profile:
             gh_repositories = get_github_repositories(self.github_profile)
-
         if gh_repositories != self.gh_repositories:
             self.gh_repositories = gh_repositories
             self.save()
+            return
+
+        # update gh_followers
+        gh_followers = None
+        if self.github_profile:
+            gh_followers = self.gh_followers
+            if gh_followers == None:
+                gh_followers = get_github_followers(self.github_profile)
+            else:
+                time_between_insertion = datetime.now() - self.last_followers_check
+                if time_between_insertion.days >= 1:
+                    gh_followers = get_github_followers(self.github_profile)
+        if gh_followers != self.gh_followers:
+            self.gh_followers = gh_followers
+            self.last_followers_check = datetime.now()
+            self.save()
+
+
 
 class Category(models.Model):
     class Meta:
