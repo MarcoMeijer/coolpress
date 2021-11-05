@@ -64,12 +64,13 @@ def insert_post_from_mediastack(single_post):
         post = Post.objects.create(category=cat, author=cu, title=title, body=body, image_link=image_link, status='published')
         return post
 
-def gather_and_create_news(categories, languages, limit) -> List[Post]:
+def gather_and_create_news(categories, languages, limit, countries=["us"]) -> List[Post]:
     url = f'http://api.mediastack.com/v1/news'
     params = {
         'limit': limit,
         'languages': ','.join(languages),
         'categories': ','.join(categories),
+        'countries': ','.join(countries),
         'access_key': '293e4cc0bfccd5aec1556f88a8767267'
     }
 
